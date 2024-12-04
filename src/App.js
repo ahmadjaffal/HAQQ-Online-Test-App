@@ -8,14 +8,22 @@ const App = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
+
     // Get products data from fakestoreapi
     const fetchProducts = async () => {
       const response = await fetch('https://fakestoreapi.com/products');
       const data = await response.json();
       setProducts(data);
-    };
+    }
 
-    fetchProducts();
+    const savedOrder = sessionStorage.getItem('productOrder');
+    if (savedOrder) {
+      const initialOrder = savedOrder ? JSON.parse(savedOrder) : products;
+      setProducts(initialOrder)
+    }
+    else {
+      fetchProducts();
+    };
 
   }, []);
 

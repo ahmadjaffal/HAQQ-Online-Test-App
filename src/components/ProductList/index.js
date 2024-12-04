@@ -1,15 +1,21 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import Modal from '../modal';
 
 const ProductList = ({ products, setProducts, searchTerm }) => {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState(null);
 
-    useEffect(() => {
-        // Retrieve the saved product order from session storage or fallback to initial order
-        const savedOrder = sessionStorage.getItem('productOrder');
-        const initialOrder = savedOrder ? JSON.parse(savedOrder) : products;
+    // Function to handle opening the modal with product details
+    const openModal = (product) => {
+        setSelectedProduct(product);
+        setIsModalOpen(true);
+    };
 
-        setProducts(initialOrder)
-    }, [products]);
-
+    // Function to handle closing the modal
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setSelectedProduct(null);
+    };
 
     // Handle drag start
     const handleDragStart = (e, index) => {
@@ -57,6 +63,23 @@ const ProductList = ({ products, setProducts, searchTerm }) => {
         );
     };
 
+    const ProductDetailsModal = ({ isModalOpen, closeModal, product }) => {
+        if (!product) return null;
+        return (
+            <Modal isOpen={isModalOpen} onClose={closeModal}>
+                <div>
+                    <div className="big-image"><img src={product.image} /></div>
+                    <div>
+                        <h2>{highlightText(product.title)}</h2>
+                        <span className="category"><b>{product.category}</b></span>
+                        <p>{highlightText(product.description)}</p>
+                        <div className="rating">Rated:  <b>{product.rating.rate}</b> out of <b>5</b> By <b>{product.rating.count}</b> Persons | <span className="price">Price: <b>${product.price}</b></span></div>
+                    </div>
+                </div>
+            </Modal>
+        );
+    }
+
     return (
         <>
             {filteredProducts.length > 0 ? <p className="count"><b>{filteredProducts.length} products</b> were found.</p> : null}
@@ -68,17 +91,26 @@ const ProductList = ({ products, setProducts, searchTerm }) => {
                             onDragStart={(e) => handleDragStart(e, index)}
                             onDragOver={handleDragOver}
                             onDrop={(e) => handleDrop(e, index)}
+                            onClick={() => openModal(product)}
                         >
-                            <h2>{highlightText(product.title)}</h2>
-                            <span className="category"><b>{product.category}</b></span>
-                            <p>{highlightText(product.description)}</p>
-                            <div className="rating">Rated:  <b>{product.rating.rate}</b> out of <b>5</b> By <b>{product.rating.count}</b> Persons | <span className="price">Price: <b>${product.price}</b></span></div>
+                            <div className="small-image"><img src={product.image} /></div>
+                            <div>
+                                <h2>{highlightText(product.title)}</h2>
+                                <span className="category"><b>{product.category}</b></span>
+                                <p>{highlightText(product.description)}</p>
+                                {/* <div className="rating">Rated:  <b>{product.rating.rate}</b> out of <b>5</b> By <b>{product.rating.count}</b> Persons | <span className="price">Price: <b>${product.price}</b></span></div> */}
+                            </div>
                         </li>
                     ))
                 ) : (
                     <li className="count"><b>No products</b> found.</li>
                 )}
             </ul>
+            <ProductDetailsModal
+                isModalOpen={isModalOpen}
+                closeModal={closeModal}
+                product={selectedProduct}
+            />
         </>
     );
 };

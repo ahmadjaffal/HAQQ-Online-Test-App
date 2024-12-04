@@ -50,11 +50,20 @@
     padding: 0;
 
     li {
+      display: flex;
+      flex-wrap: nowrap;
       cursor: grab;
       transition: 0.3s;
       margin-bottom: 1rem;
       padding-bottom: 1rem;
       border-bottom: solid 1px #d2d2d2;
+
+      .small-image {
+        margin-right: 1.5rem;
+        img {
+          width: 6.5rem;
+        }
+      }
 
       .category {
         color: #6774ff;
